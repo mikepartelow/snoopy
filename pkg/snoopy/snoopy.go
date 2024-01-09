@@ -12,7 +12,7 @@ import (
 
 type Snoopy struct {
 	logger *slog.Logger
-	snoops []snoop
+	snoops []Snoop
 }
 
 func New(filename string, logger *slog.Logger) (*Snoopy, error) {
@@ -22,14 +22,14 @@ func New(filename string, logger *slog.Logger) (*Snoopy, error) {
 	}
 	defer file.Close()
 
-	var snoops []snoop
+	var snoops []Snoop
 	err = yaml.NewDecoder(file).Decode(&snoops)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding config %q: %w", filename, err)
 	}
 
 	for i := 0; i < len(snoops); i++ {
-		snoops[i].logger = logger.With("local", snoops[i].Local, "upstream", snoops[i].Upstream)
+		snoops[i].Logger = logger.With("local", snoops[i].Local, "upstream", snoops[i].Upstream)
 	}
 
 	return &Snoopy{
@@ -48,9 +48,9 @@ func (s *Snoopy) Run() {
 		go func() {
 			defer wg.Done()
 
-			snoop.logger.Debug("Starting snoop server", "local", snoop.Local, "upstream", snoop.Upstream, "logfile", snoop.Logfile)
+			snoop.Logger.Debug("Starting snoop server", "local", snoop.Local, "upstream", snoop.Upstream, "logfile", snoop.Logfile)
 			if err := http.ListenAndServe(snoop.Local, &snoop); err != nil {
-				snoop.logger.Error("ListenAndServe:", err)
+				snoop.Logger.Error("ListenAndServe:", err)
 				panic(err)
 			}
 		}()

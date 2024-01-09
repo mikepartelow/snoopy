@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-type snoop struct {
+type Snoop struct {
 	Upstream string `yaml:"upstream"`
 	Local    string `yaml:"local"`
 	Logfile  string `yaml:"logfile"`
@@ -30,23 +30,23 @@ type snoop struct {
 		MustRewrite bool   `yaml:"must-rewrite"`
 	} `yaml:"response-rewrites"`
 
-	logger *slog.Logger
+	Logger *slog.Logger
 }
 
-func (s *snoop) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	s.logger.Debug("ServeHTTP", "req.Method", req.Method, "req.URL", req.URL, "req.Header", req.Header)
+func (s *Snoop) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	s.Logger.Debug("ServeHTTP", "req.Method", req.Method, "req.URL", req.URL, "req.Header", req.Header)
 
 	upstreamURL, _ := url.JoinPath(s.Upstream, req.URL.Path)
-	s.logger.Debug("ServeHTTP", "upstreamURL", upstreamURL)
+	s.Logger.Debug("ServeHTTP", "upstreamURL", upstreamURL)
 
-	checkErr(s.logURL(upstreamURL), w, s.logger)
+	checkErr(s.logURL(upstreamURL), w, s.Logger)
 
 	client := &http.Client{}
 	upstreamReq, err := s.newUpstreamRequest(upstreamURL, req)
-	checkErr(err, w, s.logger)
+	checkErr(err, w, s.Logger)
 
 	resp, err := client.Do(upstreamReq)
-	checkErr(err, w, s.logger)
+	checkErr(err, w, s.Logger)
 	defer resp.Body.Close()
 
 	slog.Info("response", "upstreamURL", upstreamURL, "status", resp.Status, "header", resp.Header)
@@ -55,19 +55,19 @@ func (s *snoop) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	if len(s.RespnoseRewrites) > 0 {
 		body, err := io.ReadAll(resp.Body)
-		checkErr(err, w, s.logger)
+		checkErr(err, w, s.Logger)
 
 		newBody := string(body)
 
 		for _, r := range s.RespnoseRewrites {
-			s.logger.Debug("rewriting response", "old", r.Old, "new", r.New)
+			s.Logger.Debug("rewriting response", "old", r.Old, "new", r.New)
 
 			oldNewBody := newBody
 
 			newBody = strings.ReplaceAll(newBody, r.Old, r.New)
 
 			if r.MustRewrite && oldNewBody == newBody {
-				checkErr(errors.New("must rewrite failed"), w, s.logger)
+				checkErr(errors.New("must rewrite failed"), w, s.Logger)
 			}
 		}
 
@@ -80,7 +80,7 @@ func (s *snoop) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (s *snoop) logURL(url string) error {
+func (s *Snoop) logURL(url string) error {
 	file, err := os.OpenFile(s.Logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("couldn't optn %q: %w", s.Logfile, err)
@@ -96,7 +96,7 @@ func (s *snoop) logURL(url string) error {
 	return nil
 }
 
-func (s *snoop) newUpstreamRequest(url string, req *http.Request) (*http.Request, error) {
+func (s *Snoop) newUpstreamRequest(url string, req *http.Request) (*http.Request, error) {
 	upstreamReq, err := http.NewRequest(req.Method, url, req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error creating http.Request: %w", err)
