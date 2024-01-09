@@ -48,7 +48,7 @@ func (s *Snoopy) Run() {
 		go func() {
 			defer wg.Done()
 
-			snoop.logger.Debug("Starting snoop server", "local", snoop.Local, "upstream", snoop.Upstream)
+			snoop.logger.Debug("Starting snoop server", "local", snoop.Local, "upstream", snoop.Upstream, "logfile", snoop.Logfile)
 			if err := http.ListenAndServe(snoop.Local, &snoop); err != nil {
 				snoop.logger.Error("ListenAndServe:", err)
 				panic(err)

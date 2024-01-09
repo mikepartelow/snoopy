@@ -4,9 +4,6 @@
   headers:
     - name: User-Agent
       value: snoopy/v1
-  cookies:
-    - name: c1
-      value: v1
   response-rewrites:
     - old: https://files.pythonhosted.org
       new: http://localhost:9998

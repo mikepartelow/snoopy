@@ -62,7 +62,10 @@ func (s *snoop) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		for _, r := range s.RespnoseRewrites {
 			s.logger.Debug("rewriting response", "old", r.Old, "new", r.New)
 
-			oldNewBody, newBody := newBody, strings.ReplaceAll(newBody, r.Old, r.New)
+			oldNewBody := newBody
+
+			newBody = strings.ReplaceAll(newBody, r.Old, r.New)
+
 			if r.MustRewrite && oldNewBody == newBody {
 				checkErr(errors.New("must rewrite failed"), w, s.logger)
 			}
