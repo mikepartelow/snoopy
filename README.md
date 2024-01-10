@@ -1,6 +1,6 @@
 # snoopy
 
-`snoopy` is a configurable multi-listener snooping HTTP proxy. You send requests to `snoopy`, `snoopy` logs the URLs you're fetching, optionally modifies cookies and headers, then sends your request to the configured upstream. `snoopy` will also run simple text search/replace on the response, if configured, and `snoopy` can listen on multiple ports, proxying each one to a different upstream.
+`snoopy` is a configurable multi-listener snooping (man-in-the-middle) HTTP proxy. You send requests to `snoopy`, `snoopy` logs the URLs you're fetching, optionally modifies cookies and headers, then sends your request to the configured upstream. `snoopy` will also run simple text search/replace on the response, if configured, and `snoopy` can listen on multiple ports, proxying each one to a different upstream.
 
 ## Build and Run
 
