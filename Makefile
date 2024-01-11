@@ -11,3 +11,6 @@ test:
 
 local: lint test
 	CGO_ENABLED=0 go build ${--local-args} -o . ./cmd/...
+
+run: local
+	LOG_LEVEL=debug ./snoopy
